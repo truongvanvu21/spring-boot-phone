@@ -18,4 +18,12 @@ public class ProductService {
     public List<Product> getProductsByCategoryID(String categoryID) {
         return productRepository.findByCategoryID(categoryID);
     }
+
+    public Product getProductById(String productID) {
+        return productRepository.findById(productID).orElse(null);
+    }
+
+    public List<Product> searchProductsByName(String keyword) {
+        return productRepository.findByProductNameContainingIgnoreCase(keyword);
+    }
 }

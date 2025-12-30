@@ -113,39 +113,26 @@
         
         /* Card Sản phẩm */
         .product-card {
-            border: none;
-            border-radius: 15px;
-            transition: all 0.3s ease;
-            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .product-card:hover {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
         }
-        .product-img {
-            height: 220px;
-            object-fit: contain;
-            padding: 20px;
-            background: #fff;
-        }
-        .price-tag {
-            color: var(--primary-red);
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-        .add-cart-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
+        
+        /* Đảm bảo text trên nút không bị xuống dòng khi màn hình nhỏ */
+        .btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: var(--primary-red);
-            color: white;
-            border: none;
-            transition: 0.3s;
+            white-space: nowrap;
         }
-        .add-cart-btn:hover { background: #000; transform: rotate(90deg); }
+
+        /* Hiệu ứng khi hover vào nút con mắt */
+        .btn-light:hover {
+            background-color: #e9ecef;
+            color: var(--primary-red);
+        }
 
         /* Footer */
         .main-footer {
@@ -198,7 +185,7 @@
 <nav class="navbar navbar-expand-lg sticky-top shadow-sm">
     <div class="container">
         <!-- Logo -->
-        <a class="navbar-brand fw-bold fs-2" href="#">
+        <a class="navbar-brand fw-bold fs-2" th:href="@{/user/home}">
             <i class="fa-solid fa-mobile-retro me-2"></i>PHONE<span>SHOP</span>
         </a>
 
@@ -207,10 +194,12 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
-            <!-- TÌM KIẾM (ĐÃ FIX) -->
+            <!-- TÌM KIẾM -->
             <div class="mx-auto my-2 my-lg-0 search-container">
-                <form action="#" method="get">
-                    <input type="text" class="form-control search-input" placeholder="Bạn tìm điện thoại gì...">
+                <!-- Thêm th:action dẫn về trang home -->
+                <form th:action="@{/user/home}" method="get">
+                    <input type="text" name="keyword" th:value="${keyword}" class="form-control search-input" 
+                        placeholder="Bạn tìm điện thoại gì...">
                     <button class="search-btn-inside" type="submit">
                         <i class="fa fa-search small"></i>
                     </button>
@@ -222,12 +211,32 @@
                 <a class="btn btn-primary px-3" href="#">
                     <i class="fa-solid fa-cart-shopping"></i>
                 </a>
-                <button class="btn btn-outline-primary btn-sm px-3 " type="button">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng nhập
-                </button>
-                <button class="btn btn-primary btn-sm px-3" type="button">
-                    <i class="fa-solid fa-user-plus"></i> Đăng ký
-                </button>
+                
+                <!-- Nếu chưa đăng nhập -->
+                <th:block th:if="${session.loggedInUser == null}">
+                    <a class="btn btn-outline-primary btn-sm px-3" th:href="@{/user/login}">
+                        <i class="fa-solid fa-arrow-right-to-bracket px-1"></i>Đăng nhập
+                    </a>
+                    <a class="btn btn-primary btn-sm px-3" th:href="@{/user/register}">
+                        <i class="fa-solid fa-user-plus px-1"></i>Đăng ký
+                    </a>
+                </th:block>
+                
+                <!-- Nếu đã đăng nhập -->
+                <th:block th:if="${session.loggedInUser != null}">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-user me-1"></i>
+                            <span th:text="${session.loggedInUser.fullName}">Tên người dùng</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/user/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </th:block>
             </div>
         </div>
     </div>
@@ -272,28 +281,57 @@
         
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             <div class="col" th:each="p : ${listProduct}">
-                <div class="card h-100 product-card shadow-sm">
-                    <img th:src="@{/uploads/products/{img}(img=${p.baseImage})}" class="card-img-top product-img" alt="Product">
-                    <div class="card-body p-3">
-                        <h6 class="card-title fw-bold text-dark mb-2" style="height: 40px; overflow: hidden;" th:text="${p.productName}">
+                <div class="card h-100 shadow-sm border-0 rounded-4 product-card">
+                    <!-- Phần ảnh -->
+                    <div class="position-relative">
+                        <img th:src="@{/uploads/products/{img}(img=${p.baseImage})}" 
+                            class="card-img-top p-4" alt="Product" 
+                            style="height: 220px; object-fit: contain;">
+                    </div>
+
+                    <!-- Phần nội dung -->
+                    <div class="card-body d-flex flex-column p-3">
+                        <h6 class="card-title fw-bold text-dark mb-1 text-truncate" 
+                            th:text="${p.productName}" th:title="${p.productName}">
                             Tên sản phẩm
                         </h6>
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-light text-dark border" th:text="${p.categoryID}">Hãng</span>
-                            <span class="ms-2 text-muted small"><i class="fa fa-check-circle text-success"></i> Trả góp 0%</span>
+                        
+                        <div class="mb-3">
+                            <span class="small text-success bg-success bg-opacity-10 px-2 py-1 rounded-2 fw-semibold">
+                                <i class="fa-solid fa-gift me-1"></i>Trả góp 0% - kỳ hạn đến 12 tháng 
+                            </span>
                         </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <div class="price-tag">24.890.000₫</div>
-                                <div class="text-muted text-decoration-line-through small">29.990.000₫</div>
+
+                        <div class="mt-auto">
+                            <div class="mb-3">
+                                <span class="text-danger fw-bold fs-5"
+                                    th:text="${#numbers.formatDecimal(p.price, 0, 'POINT', 0, 'COMMA')} + ' ₫'">
+                                    24.890.000 ₫
+                                </span>
                             </div>
-                            <button class="add-cart-btn shadow">
-                                <i class="fa fa-cart-plus"></i>
-                            </button>
+                            
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-danger fw-semibold rounded-3 shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" style="white-space: nowrap;">
+                                    <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ
+                                </button>
+                                
+                                <a th:href="@{/user/product/{id}(id=${p.productID})}" 
+                                class="btn btn-outline-secondary rounded-3 d-flex align-items-center justify-content-center" 
+                                style="width: 42px; height: 42px; text-decoration: none;">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Không có sản phẩm -->
+        <div class="text-center py-5" th:if="${#lists.isEmpty(listProduct)}">
+            <img src="https://cdn-icons-png.flaticon.com/512/6134/6134065.png" style="width: 100px; opacity: 0.5;">
+            <h5 class="mt-3 text-muted">Không có kết quả bạn tìm kiếm</h5>
+            <a th:href="@{/user/home}" class="btn btn-outline-danger mt-2">Xem tất cả sản phẩm</a>
         </div>
     </div>
 </div>

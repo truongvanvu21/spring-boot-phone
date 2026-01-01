@@ -259,7 +259,7 @@
             <!-- Lặp danh mục -->
             <div th:each="cat : ${listCategory}" class="col-4 col-md-2">
                 <!-- THÊM THẺ A VÀO ĐÂY -->
-                <a th:href="@{/user/home(cid=${cat.categoryID})}" class="text-decoration-none">
+                <a th:href="@{/user/home(cid=${cat.categoryID}, sort=${currentSort})}" class="text-decoration-none">
                     <div class="brand-card shadow-sm">
                         <img th:src="@{/uploads/brands/{img}(img=${cat.logoImage})}" alt="Brand Logo">
                     </div>
@@ -270,16 +270,36 @@
 
     <!-- PRODUCT LIST -->
     <div class="mb-5">
-        <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <div class="d-flex align-items-center">
                     <div style="width: 5px; height: 25px; background: var(--primary-red); margin-right: 10px;"></div>
                     <h4 class="fw-bold mb-0 text-uppercase">Gợi ý cho bạn</h4>
                 </div>
             </div>
-            <a th:href="@{/user/home}" class="text-danger text-decoration-none fw-bold">
-                Xem tất cả <i class="fa-solid fa-chevron-right ms-1"></i>
-            </a>
+            
+            <!-- Dropdown sắp xếp -->
+            <div class="d-flex align-items-center gap-3">
+                <form id="sortForm" th:action="@{/user/home}" method="get" class="d-flex align-items-center gap-2">
+                    <!-- Giữ lại các filter hiện tại -->
+                    <input type="hidden" name="cid" th:value="${currentCid}" th:if="${currentCid != null}">
+                    <input type="hidden" name="keyword" th:value="${currentKeyword}" th:if="${currentKeyword != null and !currentKeyword.isEmpty()}">
+                    
+                    <label class="text-muted small fw-semibold mb-0">Sắp xếp:</label>
+                    <select name="sort" class="form-select form-select-sm" style="width: auto;" onchange="this.form.submit()">
+                        <option value="default" th:selected="${currentSort == 'default' or currentSort == null}">Mặc định</option>
+                        <option value="price-asc" th:selected="${currentSort == 'price-asc'}">Giá: Thấp → Cao</option>
+                        <option value="price-desc" th:selected="${currentSort == 'price-desc'}">Giá: Cao → Thấp</option>
+                        <option value="name-asc" th:selected="${currentSort == 'name-asc'}">Tên: A → Z</option>
+                        <option value="name-desc" th:selected="${currentSort == 'name-desc'}">Tên: Z → A</option>
+                        <option value="newest" th:selected="${currentSort == 'newest'}">Mới nhất</option>
+                    </select>
+                </form>
+                
+                <a th:href="@{/user/home}" class="text-danger text-decoration-none fw-bold">
+                    Xem tất cả <i class="fa-solid fa-chevron-right ms-1"></i>
+                </a>
+            </div>
         </div>
         
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">

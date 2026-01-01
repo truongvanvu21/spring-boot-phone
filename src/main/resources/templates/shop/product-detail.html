@@ -105,15 +105,38 @@
 
             <!-- Actions -->
             <div class="navbar-nav align-items-center gap-2">
-                <a class="btn btn-primary px-3" href="#">
+                <a class="btn btn-primary px-3 position-relative" th:href="@{/user/cart}">
                     <i class="fa-solid fa-cart-shopping"></i>
+                    <span th:if="${session.totalItems != null && session.totalItems > 0}" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                          th:text="${session.totalItems}">0</span>
                 </a>
-                <button class="btn btn-outline-primary btn-sm px-3 " type="button">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng nhập
-                </button>
-                <button class="btn btn-primary btn-sm px-3" type="button">
-                    <i class="fa-solid fa-user-plus"></i> Đăng ký
-                </button>
+                
+                <!-- Nếu chưa đăng nhập -->
+                <th:block th:if="${session.loggedInUser == null}">
+                    <a class="btn btn-outline-primary btn-sm px-3" th:href="@{/user/login}">
+                        <i class="fa-solid fa-arrow-right-to-bracket px-1"></i>Đăng nhập
+                    </a>
+                    <a class="btn btn-primary btn-sm px-3" th:href="@{/user/register}">
+                        <i class="fa-solid fa-user-plus px-1"></i>Đăng ký
+                    </a>
+                </th:block>
+                
+                <!-- Nếu đã đăng nhập -->
+                <th:block th:if="${session.loggedInUser != null}">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-user me-1"></i>
+                            <span th:text="${session.loggedInUser.fullName}">Tên người dùng</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/user/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </th:block>
             </div>
         </div>
     </div>
@@ -123,7 +146,9 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:href="@{/user/home}">Trang chủ</a></li>
+        <li class="breadcrumb-item">
+            <a th:href="@{/user/home}"><i class="fa-solid fa-house"></i>Trang chủ</a>
+        </li>
         <li class="breadcrumb-item active" th:text="${product.productName}">Tên sản phẩm</li>
       </ol>
     </nav>
@@ -157,9 +182,12 @@
                 </div>
 
                 <div class="d-grid gap-3 d-md-flex mt-5">
-                    <button class="btn btn-danger btn-lg px-5 fw-bold">
-                        <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ hàng
-                    </button>
+                    <form th:action="@{/user/cart/add/{id}(id=${product.productID})}" method="post">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-danger btn-lg px-5 fw-bold">
+                            <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ hàng
+                        </button>
+                    </form>
                     <button class="btn btn-outline-danger btn-lg px-4">
                         <i class="fa-solid fa-heart"></i>
                     </button>

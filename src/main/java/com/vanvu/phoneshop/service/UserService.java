@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vanvu.phoneshop.repository.UserRepository;
 import com.vanvu.phoneshop.model.User;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -13,13 +12,12 @@ public class UserService {
 
     // Đăng nhập - kiểm tra email và password
     public User login(String email, String password) {       
-        Optional<User> user = userRepository.findByEmailAndPassword(email, password);        
-        return user.orElse(null);
+        return userRepository.findByEmailAndPassword(email, password);
     }
 
     // Lấy user theo email
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email);
     }
 
     // Kiểm tra email đã tồn tại chưa

@@ -208,8 +208,11 @@
 
             <!-- Actions -->
             <div class="navbar-nav align-items-center gap-2">
-                <a class="btn btn-primary px-3" href="#">
+                <a class="btn btn-primary px-3 position-relative" th:href="@{/user/cart}">
                     <i class="fa-solid fa-cart-shopping"></i>
+                    <span th:if="${session.totalItems != null && session.totalItems > 0}" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                          th:text="${session.totalItems}">0</span>
                 </a>
                 
                 <!-- Nếu chưa đăng nhập -->
@@ -311,9 +314,12 @@
                             </div>
                             
                             <div class="d-flex gap-2">
-                                <button class="btn btn-danger fw-semibold rounded-3 shadow-sm flex-grow-1 d-flex align-items-center justify-content-center" style="white-space: nowrap;">
-                                    <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ
-                                </button>
+                                <form th:action="@{/user/cart/add/{id}(id=${p.productID})}" method="post" class="flex-grow-1">
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="btn btn-danger fw-semibold rounded-3 shadow-sm w-100 d-flex align-items-center justify-content-center" style="white-space: nowrap;">
+                                        <i class="fa-solid fa-cart-shopping me-2"></i>Thêm vào giỏ
+                                    </button>
+                                </form>
                                 
                                 <a th:href="@{/user/product/{id}(id=${p.productID})}" 
                                 class="btn btn-outline-secondary rounded-3 d-flex align-items-center justify-content-center" 

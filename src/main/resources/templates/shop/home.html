@@ -233,8 +233,8 @@
                             <span th:text="${session.loggedInUser.fullName}">Tên người dùng</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/orders}"  ><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" th:href="@{/user/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
                         </ul>

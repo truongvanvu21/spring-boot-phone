@@ -29,4 +29,17 @@ public class UserService {
     public User saveUser(User user) {
         return userRepository.save(user);
     }
+
+    // Cập nhật profile user
+    public User updateUser(User user) {
+        User existingUser = userRepository.findById(user.getUserID()).orElse(null);
+        if (existingUser != null) {
+            existingUser.setFullName(user.getFullName());
+            existingUser.setPhoneNumber(user.getPhoneNumber());
+            existingUser.setAddress(user.getAddress());
+            
+            return userRepository.save(existingUser);
+        }
+        return null;
+    }
 }

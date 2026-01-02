@@ -40,7 +40,7 @@ public class HomeController {
         List<Category> categories = categoryService.getAllCategories();
         List<Product> products;
 
-        // Xác định cách sắp xếp
+        // Kiểu sắp xếp
         Sort sort = Sort.unsorted();
         if ("price-asc".equals(sortType)) {
             sort = Sort.by("price").ascending();

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Tài khoản của tôi - Phone Shop</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #d70018;
+            --hover-red: #b30014;
+        }
+
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        /* AppBar Custom */
+        .navbar {
+            background: linear-gradient(to bottom, #e07272 0%, #cd0418 100%);
+            border-bottom: 2px solid var(--primary-red);
+            padding: 10px 0;
+        }
+        .navbar-brand { color: white; }
+        .navbar-brand:hover {
+            color: white;
+        }
+        
+        /* --- PHẦN FIX: THANH TÌM KIẾM --- */
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
+        .search-input {
+            border-radius: 8px ; 
+            padding-right: 50px; 
+            border: none;
+            height: 40px;
+        }
+        .search-btn-inside {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--primary-red);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            z-index: 10;
+            border-radius: 8px;
+            width: 12%;
+        }
+        .search-btn-inside:hover {
+            opacity: 0.8;
+        }
+        /* ------------------------------- */
+
+        /* Button styles cho navbar */
+        .navbar .btn-primary { 
+            background-color: white; 
+            border-color: white;
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+        .navbar .btn-primary:hover { 
+            opacity: 0.8;
+        }
+        .navbar .btn-outline-primary { 
+            color: white; 
+            border-color: white;
+            font-weight: 600;
+            background-color: rgb(183, 13, 13);
+        }
+        .navbar .btn-outline-primary:hover { 
+            background-color: white; 
+            color: var(--primary-red);
+            border-color: white;
+        }
+
+        /* Sidebar & Cards */
+        .profile-sidebar { border-radius: 20px; overflow: hidden; background: white; }
+        .profile-card { border-radius: 20px; border: none; }
+        .card-header-custom {
+            background: linear-gradient(to top, #d80015, #f05a5a);
+            color: white; padding: 20px; font-weight: bold; border-radius: 20px 20px 0 0 !important;
+        }
+
+        /* Form Styling */
+        .input-icon {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+            z-index: 10; color: #6c757d;
+        }
+        .form-floating .form-control { padding-left: 45px; border-radius: 12px; border: 2px solid #eee; }
+        .form-floating label { padding-left: 45px; }
+        .form-control:focus { border-color: var(--primary-red); box-shadow: 0 0 0 0.2rem rgba(215, 0, 24, 0.1); }
+
+        /* Buttons */
+        .btn-custom {
+            background: var(--primary-red); color: white; border: none;
+            padding: 12px; border-radius: 12px; font-weight: 600; transition: 0.3s;
+        }
+        .btn-custom:hover { background: var(--hover-red); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(215, 0, 24, 0.3); color: white; }
+
+        /* Sidebar Menu */
+        .avatar-circle {
+            width: 100px; height: 100px; background: #eee; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 15px; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- APPBAR -->
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand fw-bold fs-2" th:href="@{/user/home}">
+            <i class="fa-solid fa-mobile-retro me-2"></i>PHONE<span>SHOP</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- TÌM KIẾM -->
+            <div class="mx-auto my-2 my-lg-0 search-container">
+                <!-- Thêm th:action dẫn về trang home -->
+                <form th:action="@{/user/home}" method="get">
+                    <input type="text" name="keyword" th:value="${keyword}" class="form-control search-input" 
+                        placeholder="Bạn tìm điện thoại gì...">
+                    <button class="search-btn-inside" type="submit">
+                        <i class="fa fa-search small"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Actions -->
+            <div class="navbar-nav align-items-center gap-2">
+                <a class="btn btn-primary px-3 position-relative" th:href="@{/user/cart}">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span th:if="${session.totalItems != null && session.totalItems > 0}" 
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                          th:text="${session.totalItems}">0</span>
+                </a>
+                
+                <!-- Nếu chưa đăng nhập -->
+                <th:block th:if="${session.loggedInUser == null}">
+                    <a class="btn btn-outline-primary btn-sm px-3" th:href="@{/user/login}">
+                        <i class="fa-solid fa-arrow-right-to-bracket px-1"></i>Đăng nhập
+                    </a>
+                    <a class="btn btn-primary btn-sm px-3" th:href="@{/user/register}">
+                        <i class="fa-solid fa-user-plus px-1"></i>Đăng ký
+                    </a>
+                </th:block>
+                
+                <!-- Nếu đã đăng nhập -->
+                <th:block th:if="${session.loggedInUser != null}">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-primary btn-sm px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-user me-1"></i>
+                            <span th:text="${session.loggedInUser.fullName}">Tên người dùng</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/orders}"  ><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" th:href="@{/user/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5 mt-4">
+    <div class="row g-4">
+        
+        <!-- SIDEBAR -->
+        <!-- <div class="col-12 col-md-4 col-lg-3">
+            <div class="profile-sidebar shadow-sm p-4 text-center">
+                <div class="avatar-circle">
+                    <i class="fa-solid fa-user-tie fa-3x text-secondary"></i>
+                </div>
+                <h5 class="fw-bold mb-1" th:text="${session.loggedInUser.fullName}">Tên người dùng</h5>
+                <p class="text-muted small mb-1" th:text="${session.loggedInUser.email}">
+                    <strong>Email: </strong>@example.com
+                </p>
+                <p class="text-muted small mb-1" th:text="${session.loggedInUser.phoneNumber}">
+                    <strong>Số điện thoại: </strong>123456789
+                </p>
+                <p class="text-muted small mb-1" th:text="${session.loggedInUser.address}">
+                    <strong>Địa chỉ: </strong>địa chỉ
+                </p>
+            </div>
+        </div> -->
+        <div class="col-12 col-md-4 col-lg-3">
+            <div class="profile-sidebar shadow-sm p-4 text-center">
+                <div class="avatar-circle mb-3">
+                    <i class="fa-solid fa-user-tie fa-3x text-secondary"></i>
+                </div>
+                <h5 class="fw-bold mb-2" th:text="${session.loggedInUser.fullName}">Tên người dùng</h5>
+                <p class="text-muted small mb-1">
+                    <strong>Email:</strong>
+                    <span th:text="${session.loggedInUser.email}">email@example.com</span>
+                </p>
+                <p class="text-muted small mb-1">
+                    <strong>Số điện thoại:</strong>
+                    <span th:text="${session.loggedInUser.phoneNumber}">0123456789</span>
+                </p>
+                <p class="text-muted small mb-1">
+                    <strong>Địa chỉ:</strong>
+                    <span th:text="${session.loggedInUser.address}">Địa chỉ</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="col-12 col-md-8 col-lg-9">
+            
+            <!-- Thông tin cá nhân -->
+            <div id="infoSection" class="profile-card card shadow-sm mb-4">
+                <div class="card-header-custom">
+                    <i class="fa-solid fa-user-pen me-2"></i>CẬP NHẬT THÔNG TIN
+                </div>
+                <div class="card-body p-4">
+                    <!-- Alerts -->
+                    <div th:if="${successInfo}" class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                        <i class="fa-solid fa-check-circle me-2"></i> <span th:text="${successInfo}">Thành công</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+
+                    <form th:action="@{/user/profile/update}" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-user input-icon"></i>
+                                    <input type="text" class="form-control" name="fullName" th:value="${user.fullName}" placeholder="Tên" required>
+                                    <label>Họ và tên</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-phone input-icon"></i>
+                                    <input type="tel" class="form-control" name="phoneNumber" th:value="${user.phoneNumber}" placeholder="SĐT">
+                                    <label>Số điện thoại</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-location-dot input-icon"></i>
+                                    <input type="text" class="form-control" name="address" th:value="${user.address}" placeholder="Địa chỉ">
+                                    <label>Địa chỉ</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-custom px-5">
+                                    <i class="fa-solid fa-save me-2"></i>Lưu thông tin
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Đổi mật khẩu -->
+            <div class="profile-card card shadow-sm">
+                <div class="card-header-custom" style="background: linear-gradient(to top, #333, #777);">
+                    <i class="fa-solid fa-lock me-2"></i>ĐỔI MẬT KHẨU
+                </div>
+                <div class="card-body p-4">
+                    <!-- Alerts Password -->
+                    <div th:if="${errorPass}" class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
+                        <span th:text="${errorPass}">Lỗi</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div th:if="${successPass}" class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
+                        <span th:text="${successPass}">Thành công</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+
+                    <form th:action="@{/user/change-password}" method="post">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-key input-icon"></i>
+                                    <input type="password" class="form-control" name="currentPassword" placeholder="Mật khẩu cũ" required>
+                                    <label>Mật khẩu hiện tại</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-shield input-icon"></i>
+                                    <input type="password" class="form-control" name="newPassword" placeholder="Mật khẩu mới" required>
+                                    <label>Mật khẩu mới</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <i class="fa-solid fa-shield input-icon"></i>
+                                    <input type="password" class="form-control" name="confirmPassword" placeholder="Xác nhận" required>
+                                    <label>Xác nhận mật khẩu mới</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-end">
+                                <button type="submit" class="btn btn-dark btn-custom px-5">
+                                    <i class="fa-solid fa-key me-2"></i>Cập nhật mật khẩu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

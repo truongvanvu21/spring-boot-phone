@@ -165,4 +165,6 @@ public class AuthController {
             return "redirect:/user/register";
         }
     }
+
+    
 }

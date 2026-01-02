@@ -422,8 +422,8 @@
                             <span th:text="${session.loggedInUser.fullName}">Tên người dùng</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/profile}"><i class="fa-solid fa-user me-2"></i>Tài khoản</a></li>
+                            <li><a class="dropdown-item" th:href="@{/user/orders}"><i class="fa-solid fa-box me-2"></i>Đơn hàng</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" th:href="@{/user/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</a></li>
                         </ul>
@@ -612,9 +612,9 @@
                             </div>
                         </div>
                         
-                        <button class="btn btn-danger btn-lg w-100 rounded-3 mt-4 py-3 fw-semibold">
+                        <a th:href="@{/user/checkout}" class="btn btn-danger btn-lg w-100 rounded-3 mt-4 py-3 fw-semibold text-decoration-none">
                             <i class="fa-solid fa-credit-card"></i> Tiến hành thanh toán
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>

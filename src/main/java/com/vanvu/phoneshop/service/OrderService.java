@@ -136,4 +136,9 @@ public class OrderService {
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
+
+    //
+    public boolean hasUserPurchasedProduct(Integer userID, String productID) {
+        return orderRepository.hasPurchasedProduct(userID, productID);
+    }
 }

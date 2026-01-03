@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import com.vanvu.phoneshop.service.ReviewService;
+import com.vanvu.phoneshop.model.Review;
 import com.vanvu.phoneshop.model.Product;
 import com.vanvu.phoneshop.model.Category;
 import java.util.List;
@@ -22,6 +24,9 @@ public class HomeController {
     
     @Autowired
     private CategoryService categoryService;
+    
+    @Autowired
+    private ReviewService reviewService;
 
     @GetMapping("/")
     public String homeRedirect() {
@@ -76,8 +81,14 @@ public class HomeController {
         Product product = productService.getProductById(id);
         if (product != null) {
             model.addAttribute("product", product);
+
+            // Lấy danh sách đánh giá
+            List<Review> reviews = reviewService.getVisibleReviewsByProduct(id);
+            model.addAttribute("reviews", reviews);
+
             return "shop/product-detail";
         }
+
         return "redirect:/user/home"; // Nếu không thấy sản phẩm thì quay về trang chủ
     }
 }

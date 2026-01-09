@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,29 @@ public class OrderService {
     // Lấy đơn hàng theo trạng thái
     public List<Order> getOrdersByStatus(Integer status) {
         return orderRepository.findByStatusOrderByOrderDateDesc(status);
+    }
+
+    // Tìm kiếm đơn hàng theo trạng thái và keyword
+    public List<Order> searchOrdersByStatusAndKeyword(Integer status, String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return orderRepository.findByStatusOrderByOrderDateDesc(status);
+        }
+        return orderRepository.searchByStatusAndKeyword(status, keyword.trim());
+    }
+
+    // Tìm kiếm đơn hàng với phân trang và lọc theo ngày
+    public Page<Order> searchOrdersWithFilters(Integer status, String keyword, 
+            LocalDateTime fromDate, LocalDateTime toDate, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String searchKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return orderRepository.searchOrdersWithFilters(status, searchKeyword, fromDate, toDate, pageable);
+    }
+
+    // Đếm số đơn hàng với bộ lọc
+    public long countOrdersWithFilters(Integer status, String keyword, 
+            LocalDateTime fromDate, LocalDateTime toDate) {
+        String searchKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return orderRepository.countOrdersWithFilters(status, searchKeyword, fromDate, toDate);
     }
 
     // Tạo đơn hàng từ giỏ hàng

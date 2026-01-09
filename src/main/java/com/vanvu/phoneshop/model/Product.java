@@ -47,7 +47,6 @@ public class Product {
     @ToString.Exclude
     private List<CartItem> cartItems = new ArrayList<>();
     
-    // Getter cho categoryID để template có thể sử dụng
     public String getCategoryID() {
         return category != null ? category.getCategoryID() : null;
     }

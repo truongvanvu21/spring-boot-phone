@@ -3,7 +3,6 @@ package com.vanvu.phoneshop.controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -27,7 +26,7 @@ import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminDashboardController {
 
     @Autowired
     private OrderService orderService;
@@ -37,6 +36,11 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
+
+    // private boolean isAdmin(HttpSession session) {
+    //     User loggedInUser = (User) session.getAttribute("loggedInUser");
+    //     return loggedInUser != null && loggedInUser.getRole() == 1;
+    // }
 
     // Hiển thị trang Dashboard
     @GetMapping("/dashboard")

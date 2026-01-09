@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý danh mục - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #a70515;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a252f;
+            text-align: center;
+        }
+
+        #sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 25px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .nav-link:hover, #sidebar .nav-link.active {
+            color: white;
+            background-color: var(--primary-red);
+        }
+
+        #sidebar .nav-link i {
+            margin-right: 15px;
+            width: 20px;
+        }
+
+        /* Main Content Styles */
+        #main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .category-img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            margin: 2px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+            #sidebar.active { margin-left: 0; }
+            #main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="fw-bold mb-0 text-white"><i class="fa-solid fa-mobile-screen-button me-2"></i>ADMIN</h4>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Tổng quan</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/products}" class="nav-link"><i class="fa-solid fa-box"></i> Quản lý sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/categories}" class="nav-link active"><i class="fa-solid fa-list"></i> Quản lý danh mục</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/order-confirm}" class="nav-link"><i class="fa-solid fa-clipboard-check"></i> Xác nhận đơn</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/orders}" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Quản lý đơn hàng</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý người dùng</a>
+            </li>
+            <li class="nav-item mt-5">
+                <a th:href="@{/admin/logout}" class="nav-link text-warning"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- TOP NAVBAR -->
+        <div class="top-navbar d-flex justify-content-between align-items-center">
+            <button class="btn btn-light d-md-none" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-list me-2"></i>Quản lý Danh mục</h5>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                    <img th:src="'https://ui-avatars.com/api/?name=' + ${session.loggedInUser != null ? session.loggedInUser.fullName : 'Admin'}" alt="avatar" class="rounded-circle me-2" width="35">
+                    <strong th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Admin'}">Admin</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user-gear me-2"></i>Hồ sơ</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" th:href="@{/admin/logout}"><i class="fa-solid fa-power-off me-2"></i>Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SEARCH & FILTER -->
+        <div class="search-box">
+            <form th:action="@{/admin/categories}" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label">Tìm kiếm</label>
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" placeholder="Nhập tên danh mục...">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-search me-1"></i> Tìm kiếm</button>
+                </div>
+                <div class="col-md-5 text-end">
+                    <a th:href="@{/admin/categories/add}" class="btn btn-success"><i class="fa-solid fa-plus me-1"></i> Thêm danh mục</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- CATEGORIES TABLE -->
+        <div class="table-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0">Danh sách danh mục</h5>
+                <span class="text-muted">Tổng: <strong th:text="${totalItems}">0</strong> danh mục</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 80px;">Logo</th>
+                            <th>Mã danh mục</th>
+                            <th>Tên danh mục</th>
+                            <th class="text-center">Số sản phẩm</th>
+                            <th class="text-center" style="width: 150px;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Nếu không có danh mục -->
+                        <tr th:if="${#lists.isEmpty(categories)}">
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="fa-solid fa-folder-open fa-3x mb-3 d-block"></i>
+                                Không có danh mục nào
+                            </td>
+                        </tr>
+                        <!-- Hiển thị danh sách danh mục -->
+                        <tr th:each="category : ${categories}">
+                            <td>
+                                <img th:src="@{/uploads/brands/{img}(img=${category.logoImage})}" alt="Brand Logo" class="category-img">
+                            </td>
+                            <td><span class="badge bg-secondary" th:text="${category.categoryID}">CAT001</span></td>
+                            <td>
+                                <div class="fw-bold" th:text="${category.categoryName}">Tên danh mục</div>
+                            </td>
+                            <td class="text-center">
+                                <span class="" th:text="${category.products != null ? category.products.size() : 0}">0</span>
+                            </td>
+                            <td class="text-center">
+                                <a th:href="@{/admin/categories/edit/{id}(id=${category.categoryID})}" class="btn btn-warning btn-action" title="Sửa">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-danger btn-action" title="Xóa" 
+                                        data-bs-toggle="modal" th:data-bs-target="'#deleteModal' + ${category.categoryID}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                                
+                                <!-- Delete Modal cho từng danh mục -->
+                                <div class="modal fade" th:id="'deleteModal' + ${category.categoryID}" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title"><i class="fa-solid fa-triangle-exclamation me-2"></i>Xác nhận xóa</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body text-start">
+                                                <p>Bạn có chắc chắn muốn xóa danh mục <strong th:text="${category.categoryName}"></strong>?</p>
+                                                <p th:if="${category.products != null && category.products.size() > 0}" class="text-danger mb-0">
+                                                    <i class="fa-solid fa-warning me-1"></i> Danh mục này đang có <strong th:text="${category.products.size()}"></strong> sản phẩm và không thể xóa!
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                <form th:action="@{/admin/categories/delete/{id}(id=${category.categoryID})}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger" 
+                                                            th:disabled="${category.products != null && category.products.size() > 0}">Xóa danh mục</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Phân trang -->
+            <nav th:if="${totalPages > 1}" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${currentPage - 1}, keyword=${keyword})}">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                    </li>
+                    <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:classappend="${i == currentPage ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${i}, keyword=${keyword})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${currentPage + 1}, keyword=${keyword})}">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle Sidebar on Mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

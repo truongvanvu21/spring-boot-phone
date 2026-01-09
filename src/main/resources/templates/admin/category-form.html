@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? 'Sửa danh mục' : 'Thêm danh mục'} + ' - Admin'">Thêm danh mục - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #a70515;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a252f;
+            text-align: center;
+        }
+
+        #sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 25px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .nav-link:hover, #sidebar .nav-link.active {
+            color: white;
+            background-color: var(--primary-red);
+        }
+
+        #sidebar .nav-link i {
+            margin-right: 15px;
+            width: 20px;
+        }
+
+        /* Main Content Styles */
+        #main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .preview-img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px dashed #ddd;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-red);
+            background-color: #fff5f5;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+            #sidebar.active { margin-left: 0; }
+            #main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="fw-bold mb-0 text-white"><i class="fa-solid fa-mobile-screen-button me-2"></i>ADMIN</h4>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Tổng quan</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/products}" class="nav-link"><i class="fa-solid fa-box"></i> Quản lý sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/categories}" class="nav-link active"><i class="fa-solid fa-list"></i> Quản lý danh mục</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/order-confirm}" class="nav-link"><i class="fa-solid fa-clipboard-check"></i> Xác nhận đơn</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/orders}" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Quản lý đơn hàng</a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý người dùng</a>
+            </li>
+            <li class="nav-item mt-5">
+                <a th:href="@{/admin/logout}" class="nav-link text-warning"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- TOP NAVBAR -->
+        <div class="top-navbar d-flex justify-content-between align-items-center">
+            <button class="btn btn-light d-md-none" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+            <h5 class="fw-bold mb-0">
+                <i class="fa-solid fa-list me-2"></i>
+                <span th:text="${isEdit ? 'Sửa danh mục' : 'Thêm danh mục mới'}">Thêm danh mục mới</span>
+            </h5>
+            <a th:href="@{/admin/categories}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
+            </a>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- FORM -->
+        <div class="form-container">
+            <form th:action="${isEdit ? '/admin/categories/edit/' + category.categoryID : '/admin/categories/add'}" 
+                  method="post" enctype="multipart/form-data">
+                
+                <div class="row">
+                    <!-- Thông tin cơ bản -->
+                    <div class="col-md-8">
+                        <h6 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-info-circle me-2"></i>Thông tin danh mục</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mã danh mục <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="categoryID" th:value="${category.categoryID}" 
+                                   th:readonly="${isEdit}" required placeholder="Nhập mã danh mục (VD: SAMSUNG, IPHONE...)">
+                            <small class="text-muted" th:if="${!isEdit}">Mã danh mục không thể thay đổi sau khi tạo</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="categoryName" th:value="${category.categoryName}" 
+                                   required placeholder="Nhập tên danh mục">
+                        </div>
+                    </div>
+
+                    <!-- Hình ảnh -->
+                    <div class="col-md-4">
+                        <h6 class="fw-bold mb-3 text-primary"><i class="fa-solid fa-image me-2"></i>Logo danh mục</h6>
+                        
+                        <div class="mb-3">
+                            <div class="upload-area" onclick="document.getElementById('imageFile').click()">
+                                <img id="previewImage"  th:src="@{/uploads/brands/{img}(img=${category.logoImage})}" alt="Brand Logo" class="preview-img mb-2">
+                                
+                                <p class="text-muted mb-0"><i class="fa-solid fa-cloud-upload-alt me-1"></i> Click để chọn ảnh</p>
+                            </div>
+                            <input type="file" id="imageFile" name="imageFile" class="d-none" accept="image/*" onchange="previewFile()">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a th:href="@{/admin/categories}" class="btn btn-secondary">
+                        <i class="fa-solid fa-times me-1"></i> Hủy
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-save me-1"></i> 
+                        <span th:text="${isEdit ? 'Cập nhật' : 'Thêm danh mục'}">Thêm danh mục</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle Sidebar on Mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Preview Image
+        function previewFile() {
+            const fileInput = document.getElementById('imageFile');
+            const preview = document.getElementById('previewImage');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

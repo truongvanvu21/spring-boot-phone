@@ -14,4 +14,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     
     // Kiểm tra email đã tồn tại chưa
     boolean existsByEmail(String email);
+
+    // Đếm số user theo role
+    long countByRole(int role);
 }

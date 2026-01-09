@@ -4,15 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.vanvu.phoneshop.repository.UserRepository;
 import com.vanvu.phoneshop.model.User;
+import com.vanvu.phoneshop.util.PasswordUtil;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    // Đăng nhập - kiểm tra email và password
-    public User login(String email, String password) {       
-        return userRepository.findByEmailAndPassword(email, password);
+    // Đếm tổng số người dùng
+    public long countUsers() {
+        return userRepository.count();
+    }
+
+    // Đếm số người dùng
+    public long countUserCustomer() {
+        return userRepository.countByRole(0);
+    }
+
+    // Đăng nhập - kiểm tra email và password với BCrypt
+    public User login(String email, String rawPassword) {       
+        User user = userRepository.findByEmail(email);
+        if (user != null && PasswordUtil.matches(rawPassword, user.getPassword())) {
+            return user;
+        }
+        return null;
     }
 
     // Lấy user theo email

@@ -17,6 +17,11 @@ public class ProductService {
         return productRepository.findAll(sort);
     }
 
+    // Đếm tổng số sản phẩm
+    public long countProducts() {
+        return productRepository.count();
+    }
+
     // Lấy theo hãng kèm sắp xếp
     public List<Product> getProductsByCategoryID(String categoryID, Sort sort) {
         return productRepository.findByCategoryCategoryID(categoryID, sort);
@@ -29,5 +34,10 @@ public class ProductService {
     // Tìm kiếm theo tên kèm sắp xếp
     public List<Product> searchProductsByName(String keyword, Sort sort) {
         return productRepository.findByProductNameContainingIgnoreCase(keyword, sort);
+    }
+
+    // Lấy sản phẩm sắp hết hàng 
+    public List<Product> getLowStockProducts(int quantity) {
+        return productRepository.findByQuantityLessThanEqualOrderByQuantityAsc(quantity);
     }
 }

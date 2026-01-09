@@ -1,6 +1,7 @@
 package com.vanvu.phoneshop.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vanvu.phoneshop.dto.CartItemDTO;
+import com.vanvu.phoneshop.dto.MonthlyRevenueDTO;
+import com.vanvu.phoneshop.dto.TopBrandDTO;
+import com.vanvu.phoneshop.dto.TopSellingProductDTO;
 import com.vanvu.phoneshop.model.Order;
 import com.vanvu.phoneshop.model.OrderDetail;
 import com.vanvu.phoneshop.model.Product;
@@ -34,6 +38,22 @@ public class OrderService {
 
     @Autowired
     private CartService cartService;
+
+    // Đếm số đơn hàng theo trạng thái
+    public long countOrdersByStatus(Integer status) {
+        return orderRepository.countByStatus(status);
+    }
+
+    // Lấy doanh thu tháng hiện tại
+    public double getMonthlyRevenue() {
+        Double revenue = orderRepository.getMonthlyRevenue();
+        return revenue != null ? revenue : 0;
+    }
+
+    // Lấy đơn hàng theo trạng thái
+    public List<Order> getOrdersByStatus(Integer status) {
+        return orderRepository.findByStatusOrderByOrderDateDesc(status);
+    }
 
     // Tạo đơn hàng từ giỏ hàng
     @Transactional
@@ -137,8 +157,46 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-    //
+    // Lấy ra user đã mua sản phẩm chưa (cho phép review)
     public boolean hasUserPurchasedProduct(Integer userID, String productID) {
         return orderRepository.hasPurchasedProduct(userID, productID);
+    }
+
+    // Lấy doanh thu 12 tháng trong năm
+    public List<Double> getMonthlyRevenueList(int year) {
+        List<MonthlyRevenueDTO> results = orderRepository.getMonthlyRevenueByYear(year);
+        
+        // Khởi tạo mảng 12 tháng
+        List<Double> monthlyRevenue = new ArrayList<>();
+        for (int i = 0; i < 12; i++) {
+            monthlyRevenue.add(0.0);
+        }
+        
+        for (MonthlyRevenueDTO dto : results) {
+            if (dto.getMonth() != null && dto.getMonth() >= 1 && dto.getMonth() <= 12) {
+                Double revenue = dto.getRevenue() != null ? dto.getRevenue() : 0.0;
+                monthlyRevenue.set(dto.getMonth() - 1, revenue);
+            }
+        }
+        
+        return monthlyRevenue;
+    }
+
+    // Lấy Top sản phẩm bán chạy
+    public List<TopSellingProductDTO> getTopSellingProducts(int limit) {
+        List<TopSellingProductDTO> results = orderRepository.getTopSellingProducts();
+        if (results.size() > limit) {
+            return results.subList(0, limit);
+        }
+        return results;
+    }
+
+    // Lấy Top hãng (Category) bán chạy
+    public List<TopBrandDTO> getTopSellingBrands(int limit) {
+        List<TopBrandDTO> results = orderRepository.getTopSellingBrands();
+        if (results.size() > limit) {
+            return results.subList(0, limit);
+        }
+        return results;
     }
 }

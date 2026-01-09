@@ -23,4 +23,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     // Tìm sản phẩm theo tên với sắp xếp
     List<Product> findByProductNameContainingIgnoreCase(String keyword, Sort sort);
+
+    // Lấy sản phẩm có số lượng thấp (sắp hết hàng)
+    List<Product> findByQuantityLessThanEqualOrderByQuantityAsc(int quantity);
 }

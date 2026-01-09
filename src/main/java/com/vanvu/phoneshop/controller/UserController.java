@@ -10,7 +10,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vanvu.phoneshop.service.UserService;
 import com.vanvu.phoneshop.model.User;
-import com.vanvu.phoneshop.util.MD5Util;
+import com.vanvu.phoneshop.util.PasswordUtil;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -92,9 +92,8 @@ public class UserController {
             return "redirect:/user/login";
         }
 
-        // Kiểm tra mật khẩu hiện tại
-        String currentPassMD5 = MD5Util.md5String(currentPassword);
-        if (!loggedInUser.getPassword().equals(currentPassMD5)) {
+        // Kiểm tra mật khẩu hiện tại bằng BCrypt
+        if (!PasswordUtil.matches(currentPassword, loggedInUser.getPassword())) {
             redirectAttributes.addFlashAttribute("errorPass", "Mật khẩu hiện tại không đúng!");
             return "redirect:/user/change-password";
         }
@@ -112,9 +111,9 @@ public class UserController {
         }
 
         try {
-            // Cập nhật mật khẩu mới
-            String newPassMD5 = MD5Util.md5String(newPassword);
-            loggedInUser.setPassword(newPassMD5);
+            // Cập nhật mật khẩu mới với BCrypt
+            String encodedPassword = PasswordUtil.encodePassword(newPassword);
+            loggedInUser.setPassword(encodedPassword);
             User updatedUser = userService.saveUser(loggedInUser);
             
             // Cập nhật session

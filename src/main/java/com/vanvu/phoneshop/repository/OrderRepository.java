@@ -1,5 +1,8 @@
 package com.vanvu.phoneshop.repository;
 
+import com.vanvu.phoneshop.dto.MonthlyRevenueDTO;
+import com.vanvu.phoneshop.dto.TopBrandDTO;
+import com.vanvu.phoneshop.dto.TopSellingProductDTO;
 import com.vanvu.phoneshop.model.Order;
 import com.vanvu.phoneshop.model.User;
 
@@ -21,12 +24,56 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     
     // Tìm đơn hàng theo trạng thái
     List<Order> findByStatus(Integer status);
-    
+
+    // Tìm đơn hàng theo trạng thái sắp xếp theo ngày giảm dần
+    List<Order> findByStatusOrderByOrderDateDesc(Integer status);
+
+    // Đếm số đơn hàng theo trạng thái
+    long countByStatus(Integer status);
+
     // Tìm đơn hàng theo User và trạng thái
     List<Order> findByUserAndStatus(User user, Integer status);
 
-    // Check user đã mua sản phẩm này chưa (cho review)
-    @Query ("SELECT COUNT(o) > 0 FROM Order o JOIN o.orderDetails od "
-    + "WHERE o.user.userID = :userID AND od.product.productID = :productID AND o.status = 2")
+    // Tính doanh thu tháng hiện tại (các đơn đã được admin xác nhận)
+    @Query("SELECT COALESCE(SUM(od.quantity * od.product.price), 0.0) " +
+           "FROM Order o JOIN o.orderDetails od " +
+           "WHERE o.status = 2 " +
+           "AND FUNCTION('MONTH', o.orderDate) = FUNCTION('MONTH', CURRENT_DATE) " +
+           "AND FUNCTION('YEAR', o.orderDate) = FUNCTION('YEAR', CURRENT_DATE)")
+    Double getMonthlyRevenue();
+
+    // Check user đã mua sản phẩm này chưa (để cho review)
+    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.orderDetails od "
+        + "WHERE o.user.userID = :userID AND od.product.productID = :productID AND o.status = 2")
     boolean hasPurchasedProduct(@Param("userID") Integer userID, @Param("productID") String productID);
+
+    // Lấy doanh thu 12 tháng của năm
+    @Query("SELECT new com.vanvu.phoneshop.dto.MonthlyRevenueDTO(" +
+           "CAST(FUNCTION('MONTH', o.orderDate) AS integer), " +
+           "CAST(COALESCE(SUM(od.quantity * od.product.price), 0.0) AS double)) " +
+           "FROM Order o JOIN o.orderDetails od " +
+           "WHERE o.status = 2 AND FUNCTION('YEAR', o.orderDate) = :year " +
+           "GROUP BY FUNCTION('MONTH', o.orderDate) " +
+           "ORDER BY FUNCTION('MONTH', o.orderDate)")
+    List<MonthlyRevenueDTO> getMonthlyRevenueByYear(@Param("year") int year);
+
+    // Lấy Top sản phẩm bán chạy nhất
+    @Query("SELECT new com.vanvu.phoneshop.dto.TopSellingProductDTO(" +
+           "od.product.productID, od.product.productName, od.product.baseImage, " +
+           "CAST(SUM(od.quantity) AS long), CAST(SUM(od.quantity * od.product.price) AS double)) " +
+           "FROM Order o JOIN o.orderDetails od " +
+           "WHERE o.status = 2 " +
+           "GROUP BY od.product.productID, od.product.productName, od.product.baseImage " +
+           "ORDER BY SUM(od.quantity) DESC")
+    List<TopSellingProductDTO> getTopSellingProducts();
+
+    // Lấy Top 5 hãng (Category) bán chạy nhất
+    @Query("SELECT new com.vanvu.phoneshop.dto.TopBrandDTO(" +
+           "od.product.category.categoryID, od.product.category.categoryName, " +
+           "CAST(SUM(od.quantity) AS long)) " +
+           "FROM Order o JOIN o.orderDetails od " +
+           "WHERE o.status = 2 " +
+           "GROUP BY od.product.category.categoryID, od.product.category.categoryName " +
+           "ORDER BY SUM(od.quantity) DESC")
+    List<TopBrandDTO> getTopSellingBrands();
 }

@@ -149,9 +149,25 @@ public class OrderService {
         updateOrderStatus(orderID, 1);
     }
 
-    // Xác nhận đơn hàng (admin)
+    // Xác nhận đơn hàng (admin) - trừ số lượng tồn kho
+    @Transactional
     public void confirmOrder(Integer orderID) {
-        updateOrderStatus(orderID, 2);
+        Order order = orderRepository.findById(orderID).orElse(null);
+        if (order != null) {
+            // Trừ số lượng tồn kho cho từng sản phẩm trong đơn hàng
+            List<OrderDetail> orderDetails = orderDetailRepository.findByOrderOrderID(orderID);
+            for (OrderDetail detail : orderDetails) {
+                Product product = detail.getProduct();
+                if (product != null) {
+                    int newQuantity = product.getQuantity() - detail.getQuantity();
+                    product.setQuantity(Math.max(0, newQuantity)); // Không để âm
+                    productRepository.save(product);
+                }
+            }
+            // Cập nhật trạng thái đơn hàng
+            order.setStatus(2);
+            orderRepository.save(order);
+        }
     }
 
     // Hủy đơn hàng (admin)

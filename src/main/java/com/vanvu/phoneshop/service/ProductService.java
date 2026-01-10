@@ -43,6 +43,11 @@ public class ProductService {
         return productRepository.count();
     }
 
+    // Đếm số sản phẩm theo categoryID
+    public long countProductsByCategoryID(String categoryID) {
+        return productRepository.countByCategoryCategoryID(categoryID);
+    }
+
     // Lấy theo hãng kèm sắp xếp
     public List<Product> getProductsByCategoryID(String categoryID, Sort sort) {
         return productRepository.findByCategoryCategoryID(categoryID, sort);

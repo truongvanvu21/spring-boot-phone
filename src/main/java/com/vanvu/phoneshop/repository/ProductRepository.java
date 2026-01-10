@@ -37,4 +37,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     // Tìm theo tên và category với phân trang
     Page<Product> findByProductNameContainingIgnoreCaseAndCategoryCategoryID(String keyword, String categoryID, Pageable pageable);
+
+    // Đếm số sản phẩm theo categoryID
+    long countByCategoryCategoryID(String categoryID);
 }

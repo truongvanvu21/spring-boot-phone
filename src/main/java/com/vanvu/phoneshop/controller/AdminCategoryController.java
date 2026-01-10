@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.vanvu.phoneshop.model.Category;
 import com.vanvu.phoneshop.model.User;
 import com.vanvu.phoneshop.service.CategoryService;
+import com.vanvu.phoneshop.service.ProductService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -33,6 +34,9 @@ public class AdminCategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ProductService productService;
 
     private final String UPLOAD_DIR = "src/main/resources/static/uploads/brands/";
 
@@ -184,9 +188,10 @@ public class AdminCategoryController {
                 return "redirect:/admin/categories";
             }
 
-            // Kiểm tra xem danh mục có sản phẩm không
-            if (category.getProducts() != null && !category.getProducts().isEmpty()) {
-                redirectAttributes.addFlashAttribute("error", "Không thể xóa danh mục đang có sản phẩm!");
+            // Kiểm tra số lượng sản phẩm của hãng trước khi xóa
+            long productCount = productService.countProductsByCategoryID(id);
+            if (productCount > 0) {
+                redirectAttributes.addFlashAttribute("error", "Không thể xóa danh mục đang có " + productCount + " sản phẩm!");
                 return "redirect:/admin/categories";
             }
 

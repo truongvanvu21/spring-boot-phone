@@ -109,4 +109,8 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
            "GROUP BY od.product.category.categoryID, od.product.category.categoryName " +
            "ORDER BY SUM(od.quantity) DESC")
     List<TopBrandDTO> getTopSellingBrands();
+        
+    // Lấy Order kèm OrderDetails (trang chi tiết đơn hàng)
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderDetails WHERE o.orderID = :orderID")
+    Order findByIdWithDetails(@Param("orderID") Integer orderID);
 }

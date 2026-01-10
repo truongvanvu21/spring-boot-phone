@@ -1,7 +1,11 @@
 package com.vanvu.phoneshop.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import com.vanvu.phoneshop.repository.UserRepository;
 import com.vanvu.phoneshop.model.User;
 import com.vanvu.phoneshop.util.PasswordUtil;
@@ -35,6 +39,11 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    // Lấy user theo ID
+    public User getUserById(Integer userID) {
+        return userRepository.findById(userID).orElse(null);
+    }
+
     // Kiểm tra email đã tồn tại chưa
     public boolean isEmailExists(String email) {
         return userRepository.existsByEmail(email);
@@ -56,5 +65,12 @@ public class UserService {
             return userRepository.save(existingUser);
         }
         return null;
+    }
+
+    // Tìm kiếm khách hàng với phân trang
+    public Page<User> searchCustomers(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String searchKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return userRepository.searchCustomers(searchKeyword, pageable);
     }
 }

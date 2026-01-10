@@ -130,10 +130,10 @@
                 <a th:href="@{/admin/orders}" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Quản lý đơn hàng</a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý người dùng</a>
+                <a th:href="@{/admin/users}" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
             </li>
-            <li class="nav-item mt-5">
-                <a th:href="@{/admin/logout}" class="nav-link text-warning"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+            <li class="nav-item">
+                <a th:href="@{/admin/reviews}" class="nav-link"><i class="fa-solid fa-star"></i> Quản lý đánh giá</a>
             </li>
         </ul>
     </nav>
@@ -146,7 +146,7 @@
             <button class="btn btn-light d-md-none" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
             <h5 class="fw-bold mb-0">
                 <i class="fa-solid fa-file-invoice me-2"></i>Chi tiết đơn hàng 
-                <span class="badge bg-primary" th:text="'#ORD-' + ${order.orderID}">#ORD-0</span>
+                <span class="badge bg-secondary" th:text="'#' + ${order.orderID}">#0</span>
             </h5>
             <a th:href="@{/admin/order-confirm}" class="btn btn-outline-secondary">
                 <i class="fa-solid fa-arrow-left me-1"></i> Quay lại
@@ -240,7 +240,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xác nhận đơn hàng <strong th:text="'#ORD-' + ${order.orderID}"></strong>?</p>
+                    <p>Bạn có chắc chắn muốn xác nhận đơn hàng <strong th:text="'#' + ${order.orderID}"></strong>?</p>
                     <p class="text-muted mb-1">Khách hàng: <strong th:text="${order.user.fullName}"></strong></p>
                     <p class="text-muted mb-0">Tổng tiền: <strong class="text-danger" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'"></strong></p>
                 </div>
@@ -263,7 +263,7 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn từ chối đơn hàng <strong th:text="'#ORD-' + ${order.orderID}"></strong>?</p>
+                    <p>Bạn có chắc chắn muốn từ chối đơn hàng <strong th:text="'#' + ${order.orderID}"></strong>?</p>
                     <p class="text-muted mb-1">Khách hàng: <strong th:text="${order.user.fullName}"></strong></p>
                 </div>
                 <div class="modal-footer">

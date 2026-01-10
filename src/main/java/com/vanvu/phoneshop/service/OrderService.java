@@ -120,9 +120,9 @@ public class OrderService {
         return order;
     }
 
-    // Lấy đơn hàng theo ID
+    // Lấy đơn hàng theo ID (kèm chi tiết đơn hàng bằng JOIN FETCH)
     public Order getOrderById(Integer orderID) {
-        return orderRepository.findById(orderID).orElse(null);
+        return orderRepository.findByIdWithDetails(orderID);
     }
 
     // Lấy danh sách đơn hàng của user

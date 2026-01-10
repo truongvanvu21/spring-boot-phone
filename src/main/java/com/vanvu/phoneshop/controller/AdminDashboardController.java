@@ -8,14 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vanvu.phoneshop.dto.TopBrandDTO;
 import com.vanvu.phoneshop.dto.TopSellingProductDTO;
-import com.vanvu.phoneshop.model.Order;
 import com.vanvu.phoneshop.model.Product;
 import com.vanvu.phoneshop.model.User;
 import com.vanvu.phoneshop.service.OrderService;
@@ -56,9 +52,6 @@ public class AdminDashboardController {
         long newOrders = orderService.countOrdersByStatus(1); // Đơn chờ xác nhận (đã thanh toán)
         double monthlyRevenue = orderService.getMonthlyRevenue();
 
-        // Lấy danh sách đơn hàng chờ xác nhận
-        List<Order> pendingOrders = orderService.getOrdersByStatus(1);
-
         // Lấy doanh thu 12 tháng của năm hiện tại cho biểu đồ
         int currentYear = LocalDate.now().getYear();
         List<Double> monthlyRevenueList = orderService.getMonthlyRevenueList(currentYear);
@@ -94,7 +87,6 @@ public class AdminDashboardController {
         model.addAttribute("totalUserCustomer", totalUserCustomer);
         model.addAttribute("newOrders", newOrders);
         model.addAttribute("monthlyRevenue", monthlyRevenue);
-        model.addAttribute("pendingOrders", pendingOrders);
 
         // Dữ liệu cho biểu đồ
         model.addAttribute("monthlyRevenueList", monthlyRevenueList);
@@ -109,30 +101,6 @@ public class AdminDashboardController {
         model.addAttribute("lowStockCounts", lowStockCounts);
 
         return "admin/dashboard";
-    }
-
-    // Xác nhận đơn hàng
-    @PostMapping("/order/confirm/{orderID}")
-    public String confirmOrder(@PathVariable Integer orderID, RedirectAttributes redirectAttributes) {
-        try {
-            orderService.confirmOrder(orderID);
-            redirectAttributes.addFlashAttribute("success", "Xác nhận đơn hàng thành công!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-        }
-        return "redirect:/admin/dashboard";
-    }
-
-    // Hủy đơn hàng
-    @PostMapping("/order/cancel/{orderID}")
-    public String cancelOrder(@PathVariable Integer orderID, RedirectAttributes redirectAttributes) {
-        try {
-            orderService.cancelOrder(orderID);
-            redirectAttributes.addFlashAttribute("success", "Đã hủy đơn hàng!");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra: " + e.getMessage());
-        }
-        return "redirect:/admin/dashboard";
     }
 
 }

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết đánh giá - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #a70515;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            overflow-x: hidden;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #2c3e50;
+            color: white;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a252f;
+            text-align: center;
+        }
+
+        #sidebar .nav-link {
+            color: #bdc3c7;
+            padding: 15px 25px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .nav-link:hover, #sidebar .nav-link.active {
+            color: white;
+            background-color: var(--primary-red);
+        }
+
+        #sidebar .nav-link i {
+            margin-right: 15px;
+            width: 20px;
+        }
+
+        #main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .info-card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+
+        .info-card-body {
+            padding: 25px;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.5rem;
+        }
+
+        .product-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .admin-reply-box {
+            background: #e8f4fd;
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            border-radius: 0 10px 10px 0;
+            margin-top: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar { margin-left: calc(-1 * var(--sidebar-width)); }
+            #sidebar.active { margin-left: 0; }
+            #main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="fw-bold mb-0 text-white"><i class="fa-solid fa-mobile-screen-button me-2"></i>ADMIN</h4>
+        </div>
+        <ul class="nav flex-column mt-3">
+            <li class="nav-item">
+                <a th:href="@{/admin/dashboard}" class="nav-link"><i class="fa-solid fa-chart-line"></i> Tổng quan</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/products}" class="nav-link"><i class="fa-solid fa-box"></i> Quản lý sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/categories}" class="nav-link"><i class="fa-solid fa-list"></i> Quản lý danh mục</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/order-confirm}" class="nav-link"><i class="fa-solid fa-clipboard-check"></i> Xác nhận đơn</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/orders}" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Quản lý đơn hàng</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/users}" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
+            </li>
+            <li class="nav-item">
+                <a th:href="@{/admin/reviews}" class="nav-link active"><i class="fa-solid fa-star"></i> Quản lý đánh giá</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- TOP NAVBAR -->
+        <div class="top-navbar d-flex justify-content-between align-items-center">
+            <div>
+                <a th:href="@{/admin/reviews}" class="btn btn-outline-secondary me-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <span class="fw-bold"><i class="fa-solid fa-star me-2"></i>Chi tiết đánh giá #<span th:text="${review.reviewID}">0</span></span>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
+                    <img th:src="'https://ui-avatars.com/api/?name=' + ${session.loggedInUser != null ? session.loggedInUser.fullName : 'Admin'}" alt="avatar" class="rounded-circle me-2" width="35">
+                    <strong th:text="${session.loggedInUser != null ? session.loggedInUser.fullName : 'Admin'}">Admin</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li><a class="dropdown-item" href="#"><i class="fa-solid fa-user-gear me-2"></i>Hồ sơ</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" th:href="@{/admin/logout}"><i class="fa-solid fa-power-off me-2"></i>Đăng xuất</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Thông báo -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Review Info -->
+            <div class="col-lg-8">
+                <!-- Product Info -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-box me-2 text-primary"></i>Sản phẩm được đánh giá</h6>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-flex align-items-center">
+                            <img th:src="@{/uploads/products/{img}(img=${review.product.baseImage})}" alt="product" class="product-img me-3">
+                            <div>
+                                <h5 class="mb-1" th:text="${review.product.productName}">Tên sản phẩm</h5>
+                                <p class="text-muted mb-0" th:text="${review.product.category.categoryName}">Danh mục</p>
+                                <p class="text-danger fw-bold mb-0" th:text="${#numbers.formatDecimal(review.product.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Content -->
+                <div class="info-card">
+                    <div class="info-card-header d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-comment me-2 text-success"></i>Nội dung đánh giá</h6>
+                        <span th:if="${review.isVisible == false}" class="badge bg-danger">Đã ẩn</span>
+                        <span th:if="${review.isVisible == true}" class="badge bg-success">Hiển thị</span>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img th:src="'https://ui-avatars.com/api/?name=' + ${review.user.fullName} + '&background=random'" 
+                                 alt="avatar" class="user-avatar me-3">
+                            <div>
+                                <h6 class="mb-0" th:text="${review.user.fullName}">Tên khách hàng</h6>
+                                <small class="text-muted" th:text="${#temporals.format(review.createdDate, 'dd/MM/yyyy HH:mm')}">Ngày đăng</small>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-stars mb-3">
+                            <i th:each="i : ${#numbers.sequence(1, review.rating)}" class="fa-solid fa-star"></i>
+                            <!-- <i th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="fa-regular fa-star"></i> -->
+                            <span class="ms-2 text-dark" th:text="${review.rating} + '/5'">5/5</span>
+                        </div>
+
+                        <p class="mb-0" th:text="${review.comment}">Nội dung đánh giá</p>
+
+                        <!-- Admin Reply (nếu có) -->
+                        <div th:if="${review.adminReply != null}" class="admin-reply-box">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fa-solid fa-store me-2 text-primary"></i>
+                                <strong>Phản hồi từ cửa hàng</strong>
+                                <small class="text-muted ms-auto" th:text="${#temporals.format(review.repliedDate, 'dd/MM/yyyy HH:mm')}">Ngày trả lời</small>
+                            </div>
+                            <p class="mb-0" th:text="${review.adminReply}">Nội dung phản hồi</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-reply me-2 text-info"></i>Trả lời đánh giá</h6>
+                    </div>
+                    <div class="info-card-body">
+                        <form th:action="@{/admin/reviews/reply/{id}(id=${review.reviewID})}" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">Nội dung phản hồi <span class="text-danger">*</span></label>
+                                <textarea class="form-control" name="adminReply" rows="4" required 
+                                          placeholder="Nhập nội dung phản hồi cho khách hàng..."
+                                          th:text="${review.adminReply}"></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/admin/reviews}" class="btn btn-secondary">
+                                    <i class="fa-solid fa-times me-1"></i> Hủy
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-paper-plane me-1"></i> Gửi phản hồi
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="col-lg-4">
+                <!-- Customer Info -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-user me-2 text-primary"></i>Thông tin khách hàng</h6>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img th:src="'https://ui-avatars.com/api/?name=' + ${review.user.fullName} + '&size=60&background=random'" 
+                                 alt="avatar" class="rounded-circle me-3" width="60">
+                            <div>
+                                <h6 class="mb-0" th:text="${review.user.fullName}">Tên khách hàng</h6>
+                                <small class="text-muted" th:text="${review.user.email}">Email</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <p class="mb-2">
+                            <i class="fa-solid fa-phone me-2 text-muted"></i>
+                            <span th:text="${review.user.phoneNumber != null ? review.user.phoneNumber : 'Chưa cập nhật'}">0123456789</span>
+                        </p>
+                        <p class="mb-0">
+                            <i class="fa-solid fa-location-dot me-2 text-muted"></i>
+                            <span th:text="${review.user.address != null ? review.user.address : 'Chưa cập nhật'}">Địa chỉ</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-bolt me-2 text-warning"></i>Thao tác nhanh</h6>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="d-grid gap-2">
+                            <form th:if="${review.isVisible == true}" th:action="@{/admin/reviews/hide/{id}(id=${review.reviewID})}" 
+                                  method="post" onsubmit="return confirm('Bạn có chắc muốn ẩn đánh giá này?')">
+                                <button type="submit" class="btn btn-warning w-100">
+                                    <i class="fa-solid fa-eye-slash me-2"></i> Ẩn đánh giá (Vi phạm)
+                                </button>
+                            </form>
+                            <form th:if="${review.isVisible == false}" th:action="@{/admin/reviews/restore/{id}(id=${review.reviewID})}" 
+                                  method="post">
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fa-solid fa-eye me-2"></i> Khôi phục đánh giá
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/reviews/delete/{id}(id=${review.reviewID})}" 
+                                  method="post" onsubmit="return confirm('Bạn có chắc muốn xóa vĩnh viễn đánh giá này? Hành động này không thể hoàn tác!')">
+                                <button type="submit" class="btn btn-danger w-100">
+                                    <i class="fa-solid fa-trash me-2"></i> Xóa vĩnh viễn
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Info -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-info-circle me-2 text-info"></i>Thông tin đánh giá</h6>
+                    </div>
+                    <div class="info-card-body">
+                        <div class="mb-2">
+                            <small class="text-muted">Mã đánh giá</small>
+                            <p class="mb-0 fw-bold">#<span th:text="${review.reviewID}">0</span></p>
+                        </div>
+                        <div class="mb-2">
+                            <small class="text-muted">Ngày đánh giá</small>
+                            <p class="mb-0" th:text="${#temporals.format(review.createdDate, 'dd/MM/yyyy HH:mm')}">Ngày</p>
+                        </div>
+                        <div th:if="${review.repliedDate != null}">
+                            <small class="text-muted">Ngày trả lời</small>
+                            <p class="mb-0" th:text="${#temporals.format(review.repliedDate, 'dd/MM/yyyy HH:mm')}">Ngày</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarToggle')?.addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

@@ -1,21 +1,23 @@
 package com.vanvu.phoneshop.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.data.domain.Sort;
-
-import com.vanvu.phoneshop.service.ProductService;
-import com.vanvu.phoneshop.service.CategoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import com.vanvu.phoneshop.service.ReviewService;
-import com.vanvu.phoneshop.model.Review;
-import com.vanvu.phoneshop.model.Product;
-import com.vanvu.phoneshop.model.Category;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.vanvu.phoneshop.model.Category;
+import com.vanvu.phoneshop.model.Product;
+import com.vanvu.phoneshop.model.Review;
+import com.vanvu.phoneshop.service.CategoryService;
+import com.vanvu.phoneshop.service.ProductService;
+import com.vanvu.phoneshop.service.ReviewService;
 
 @Controller
 public class HomeController {
@@ -67,9 +69,17 @@ public class HomeController {
         } else {
             products = productService.getAllProducts(sort);
         }
+
+        // Tính rating trung bình cho mỗi sản phẩm
+        Map<String, Double> productRatings = new HashMap<>();
+        for (Product p : products) {
+            Double avgRating = reviewService.getAverageRating(p.getProductID());
+            productRatings.put(p.getProductID(), avgRating);
+        }
         
         model.addAttribute("listProduct", products);
         model.addAttribute("listCategory", categories);
+        model.addAttribute("productRatings", productRatings);
         model.addAttribute("currentSort", sortType);
         model.addAttribute("currentCid", cid);
         model.addAttribute("currentKeyword", keyword);
@@ -86,9 +96,15 @@ public class HomeController {
             List<Review> reviews = reviewService.getVisibleReviewsByProduct(id);
             model.addAttribute("reviews", reviews);
 
+            // Tính rating trung bình
+            Double avgRating = reviewService.getAverageRating(id);
+            Long reviewCount = reviewService.countReviewsByProduct(id);
+            model.addAttribute("avgRating", avgRating);
+            model.addAttribute("reviewCount", reviewCount);
+
             return "shop/product-detail";
         }
 
-        return "redirect:/user/home"; // Nếu không thấy sản phẩm thì quay về trang chủ
+        return "redirect:/user/home";
     }
 }

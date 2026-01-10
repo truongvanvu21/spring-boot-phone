@@ -177,10 +177,10 @@
                 <a th:href="@{/admin/orders}" class="nav-link active"><i class="fa-solid fa-truck-fast"></i> Quản lý đơn hàng</a>
             </li>
             <li class="nav-item">
-                <a href="#" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý người dùng</a>
+                <a th:href="@{/admin/users}" class="nav-link"><i class="fa-solid fa-users"></i> Quản lý khách hàng</a>
             </li>
-            <li class="nav-item mt-5">
-                <a th:href="@{/admin/logout}" class="nav-link text-warning"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+            <li class="nav-item">
+                <a th:href="@{/admin/reviews}" class="nav-link"><i class="fa-solid fa-star"></i> Quản lý đánh giá</a>
             </li>
         </ul>
     </nav>
@@ -225,7 +225,6 @@
                                 <p><strong>Ngày đặt:</strong> <span th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}"></span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Phương thức thanh toán:</strong> Thanh toán khi nhận hàng (COD)</p>
                                 <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold fs-5" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</span></p>
                             </div>
                         </div>
@@ -239,37 +238,14 @@
                     </div>
                     <div class="info-card-body p-0">
                         <div th:each="detail : ${order.orderDetails}" class="product-item">
-                            <img th:src="@{/uploads/products/{img}(img=${detail.product.image})}" th:alt="${detail.product.productName}" onerror="this.src='https://via.placeholder.com/80'">
+                            <img th:src="@{/uploads/products/{img}(img=${detail.product.baseImage})}" th:alt="${detail.product.productName}">
                             <div class="flex-grow-1">
                                 <h6 class="mb-1" th:text="${detail.product.productName}">Tên sản phẩm</h6>
-                                <small class="text-muted" th:text="${detail.product.brand.brandName}">Thương hiệu</small>
+                                <small class="text-muted" th:text="${detail.product.category.categoryName}">Danh mục</small>
                             </div>
                             <div class="text-end">
-                                <div class="text-danger fw-bold" th:text="${#numbers.formatDecimal(detail.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</div>
+                                <div class="text-danger fw-bold" th:text="${#numbers.formatDecimal(detail.product.price, 0, 'COMMA', 0, 'POINT') + 'đ'}">0đ</div>
                                 <small class="text-muted">x<span th:text="${detail.quantity}">1</span></small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Order Timeline -->
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <h6 class="fw-bold mb-0"><i class="fa-solid fa-clock-rotate-left me-2 text-info"></i>Trạng thái đơn hàng</h6>
-                    </div>
-                    <div class="info-card-body">
-                        <div class="order-timeline">
-                            <div class="timeline-item">
-                                <strong>Đơn hàng đã được xác nhận</strong>
-                                <p class="text-muted mb-0 small">Đơn hàng đang được chuẩn bị giao</p>
-                            </div>
-                            <div class="timeline-item">
-                                <strong>Đã thanh toán</strong>
-                                <p class="text-muted mb-0 small">Khách hàng đã thanh toán đơn hàng</p>
-                            </div>
-                            <div class="timeline-item">
-                                <strong>Đơn hàng đã được đặt</strong>
-                                <p class="text-muted mb-0 small" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Ngày đặt</p>
                             </div>
                         </div>
                     </div>

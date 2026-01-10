@@ -319,6 +319,14 @@
                             Tên sản phẩm
                         </h6>
                         
+                        <!-- Rating -->
+                        <div class="mb-2">
+                            <span class="text-warning">
+                                <i class="fa-solid fa-star small"></i>
+                            </span>
+                            <span class="small fw-semibold" th:text="${productRatings[p.productID]}">5.0</span>
+                        </div>
+                        
                         <div class="mb-3">
                             <span class="small text-success bg-success bg-opacity-10 px-2 py-1 rounded-2 fw-semibold">
                                 <i class="fa-solid fa-gift me-1"></i>Trả góp 0% - kỳ hạn đến 12 tháng 
